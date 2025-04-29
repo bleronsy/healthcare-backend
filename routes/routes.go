@@ -1,29 +1,26 @@
 package routes
 
 import (
-	"healthcare-app/healthcare-backend/handlers"
+	"healthcare-app/healthcare-backend/controllers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	router.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
-	})
+func SetupRoutes(router *gin.Engine) {
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
-	patientRoutes := router.Group("/patients")
-	{
-		patientRoutes.POST("/", handlers.CreatePatient)
-		patientRoutes.GET("/", handlers.GetAllPatients)
-		patientRoutes.GET("/:id", handlers.GetPatientByID)
-	}
+	router.GET("/patients", controllers.GetPatients)
+	router.GET("/patients/:id", controllers.GetPatientByID)
+	router.POST("/patients", controllers.CreatePatient)
 
-	appointmentRoutes := router.Group("/appointments")
-	{
-		appointmentRoutes.POST("/", handlers.CreateAppointment)
-		appointmentRoutes.GET("/", handlers.GetAllAppointments)
-		appointmentRoutes.GET("/patient/:patient_id", handlers.GetAppointmentsByPatientID)
-	}
+	router.GET("/appointments", controllers.GetAppointments)
+	router.GET("/appointments/patient/:id", controllers.GetAppointmentsForPatient)
+	router.POST("/patients/:id/appointments", controllers.CreateAppointment)
 }

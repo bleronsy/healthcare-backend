@@ -1,0 +1,62 @@
+definitions:
+  models.Patient:
+    type: object
+info:
+  contact: {}
+paths:
+  /patients:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of patients
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Patient'
+            type: array
+      summary: Get all patients
+      tags:
+      - patients
+    post:
+      consumes:
+      - application/json
+      description: Create a new patient and store in the database
+      parameters:
+      - description: Patient Data
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/models.Patient'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Patient Created
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new patient
+swagger: "2.0"

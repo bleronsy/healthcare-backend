@@ -9,13 +9,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("healthcare.db"), &gorm.Config{})
+var DB *gorm.DB
+
+func InitDatabase() {
+	var err error
+	DB, err = gorm.Open(sqlite.Open("healthcare.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect database:", err)
+		log.Fatal("Failed to connect to the database:", err)
 	}
 
-	// Auto-migrate models
-	db.AutoMigrate(&models.Patient{}, &models.Appointment{})
-	return db
+	err = DB.AutoMigrate(&models.Patient{}, &models.Appointment{})
+	if err != nil {
+		log.Fatal("Failed to migrate database:", err)
+	}
 }
