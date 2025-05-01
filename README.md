@@ -38,7 +38,23 @@ The API includes Swagger documentation to provide interactive documentation for 
 
 ## Project Structure
 
-healthcare-app/ ├── config/ │ └── database.go # Database connection and migration setup ├── controllers/ │ ├── appointment_controller.go # Appointment related API logic │ └── patient_controller.go # Patient related API logic ├── middleware/ │ └── logger.go # Custom logger middleware for request logging ├── models/ │ ├── appointment.go # Appointment data model │ └── patient.go # Patient data model ├── routes/ │ └── routes.go # Route setup for the API ├── docs/ │ └── swagger.json # Swagger generated documentation └──
+```bash
+healthcare-app/
+├── config/
+│   └── database.go         # Database connection and migration setup
+├── controllers/
+│   ├── appointment_controller.go  # Appointment-related API logic
+│   └── patient_controller.go     # Patient-related API logic
+├── middleware/
+│   └── logger.go           # Custom logger middleware for request logging
+├── models/
+│   ├── appointment.go      # Appointment data model
+│   └── patient.go          # Patient data model
+├── routes/
+│   └── routes.go           # Route setup for the API
+├── docs/
+│   └── swagger.json        # Swagger generated documentation
+└── main.go                 # Main application entry point
 
 ---
 
