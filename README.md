@@ -55,6 +55,7 @@ healthcare-app/
 ├── docs/
 │   └── swagger.json        # Swagger generated documentation
 └── main.go                 # Main application entry point
+```
 
 ---
 
