@@ -15,6 +15,55 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/appointments": {
+            "get": {
+                "description": "Retrieve a paginated list of appointments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "appointments"
+                ],
+                "summary": "Get all appointments",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/patients": {
             "get": {
                 "description": "Retrieve a paginated list of patients",
@@ -97,11 +146,258 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/patients/{id}": {
+            "get": {
+                "description": "Retrieve a single patient by their ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "patients"
+                ],
+                "summary": "Get patient by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Patient"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/patients/{id}/appointments": {
+            "get": {
+                "description": "Retrieve all appointments for a specific patient by patient ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "appointments"
+                ],
+                "summary": "Get all appointments for a specific patient",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Appointment"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new appointment and link it to an existing patient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "appointments"
+                ],
+                "summary": "Create a new appointment for a patient",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Appointment Data",
+                        "name": "appointment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Appointment Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Appointment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "models.Appointment": {
+            "description": "Appointment data, including date, time, and reason for the appointment.",
+            "type": "object",
+            "required": [
+                "date",
+                "time"
+            ],
+            "properties": {
+                "date": {
+                    "description": "Date of the appointment\n@example 2025-05-01",
+                    "type": "string",
+                    "example": "2025-05-01"
+                },
+                "id": {
+                    "description": "ID of the appointment\n@example 1",
+                    "type": "integer"
+                },
+                "notes": {
+                    "description": "Notes for the appointment\n@example \"Patient reports feeling unwell.\"",
+                    "type": "string",
+                    "example": "Patient reports feeling unwell."
+                },
+                "patient_id": {
+                    "description": "Foreign key to the patient this appointment belongs to",
+                    "type": "integer"
+                },
+                "reason": {
+                    "description": "Reason for the appointment\n@example Routine Checkup",
+                    "type": "string",
+                    "example": "Routine Checkup"
+                },
+                "time": {
+                    "description": "Time of the appointment\n@example 10:00 AM",
+                    "type": "string",
+                    "example": "10:00 AM"
+                }
+            }
+        },
         "models.Patient": {
-            "type": "object"
+            "description": "Patient data, including name, email, and appointments.",
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "appointments": {
+                    "description": "Appointments associated with the patient\n@description Patient's appointments (if any)\n@swagger:property\n@type array\n@items Appointment\n@model",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Appointment"
+                    }
+                },
+                "created_at": {
+                    "description": "CreatedAt timestamp (inherited from gorm.Model)\n@example \"2025-05-01T12:00:00Z\"",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt timestamp (nullable, inherited from gorm.Model)\n@example \"2025-05-01T12:00:00Z\"",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Email of the patient\n@example john.doe@example.com\n@description Patient's email address\n@required",
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                },
+                "id": {
+                    "description": "ID of the patient (inherited from gorm.Model)\n@example 1",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name of the patient\n@example John Doe\n@description Patient's full name\n@required",
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt timestamp (inherited from gorm.Model)\n@example \"2025-05-01T12:00:00Z\"",
+                    "type": "string"
+                }
+            }
         }
     }
 }`

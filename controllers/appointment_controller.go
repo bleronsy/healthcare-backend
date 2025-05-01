@@ -10,6 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateAppointment godoc
+// @Summary      Create a new appointment for a patient
+// @Description  Create a new appointment and link it to an existing patient
+// @Tags         appointments
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Patient ID"
+// @Param        appointment body models.Appointment true "Appointment Data"
+// @Success      201 {object} models.Appointment "Appointment Created"
+// @Failure      400 {object} map[string]string "Bad Request"
+// @Failure      404 {object} map[string]string "Patient Not Found"
+// @Failure      500 {object} map[string]string "Internal Server Error"
+// @Router       /patients/{id}/appointments [post]
 func CreateAppointment(c *gin.Context) {
 	patientID := c.Param("id")
 
@@ -35,6 +48,17 @@ func CreateAppointment(c *gin.Context) {
 	c.JSON(http.StatusCreated, appointment)
 }
 
+// GetAppointments godoc
+// @Summary      Get all appointments
+// @Description  Retrieve a paginated list of appointments
+// @Tags         appointments
+// @Accept       json
+// @Produce      json
+// @Param        page  query int false "Page number"
+// @Param        limit query int false "Items per page"
+// @Success      200 {array} models.Appointment
+// @Failure      500 {object} map[string]string "Internal Server Error"
+// @Router       /appointments [get]
 func GetAppointments(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -52,6 +76,17 @@ func GetAppointments(c *gin.Context) {
 	c.JSON(http.StatusOK, appointments)
 }
 
+// GetAppointmentsForPatient godoc
+// @Summary      Get all appointments for a specific patient
+// @Description  Retrieve all appointments for a specific patient by patient ID
+// @Tags         appointments
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Patient ID"
+// @Success      200 {array} models.Appointment
+// @Failure      404 {object} map[string]string "Patient Not Found"
+// @Failure      500 {object} map[string]string "Internal Server Error"
+// @Router       /patients/{id}/appointments [get]
 func GetAppointmentsForPatient(c *gin.Context) {
 	patientID := c.Param("id")
 	var appointments []models.Appointment

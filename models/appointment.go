@@ -1,23 +1,29 @@
 package models
 
-import "gorm.io/gorm"
-
 // Appointment represents an appointment for a patient
-// @Description Appointment data with date, time, notes, and the associated patient.
+// @Description Appointment data, including date, time, and reason for the appointment.
 // @Model
 type Appointment struct {
-	gorm.Model
+	// ID of the appointment
+	// @example 1
+	ID uint `json:"id"`
+
 	// Date of the appointment
-	// @example "2025-04-29"
-	Date string `json:"date" binding:"required" swagger:"desc(Appointment date)"`
+	// @example 2025-05-01
+	Date string `json:"date" binding:"required" example:"2025-05-01"`
+
 	// Time of the appointment
-	// @example "09:00 AM"
-	Time string `json:"time" binding:"required" swagger:"desc(Appointment time)"`
-	// Additional notes for the appointment
-	// @example "Patient has a checkup."
-	Notes string `json:"notes" swagger:"desc(Additional appointment notes)"`
-	// PatientID references the Patient the appointment is for
-	PatientID uint `json:"patient_id" swagger:"desc(Patient ID the appointment is associated with)"`
-	// The Patient associated with this appointment
-	Patient Patient `json:"patient" gorm:"foreignKey:PatientID" swagger:"desc(Patient details for the appointment)"`
+	// @example 10:00 AM
+	Time string `json:"time" binding:"required" example:"10:00 AM"`
+
+	// Reason for the appointment
+	// @example Routine Checkup
+	Reason string `json:"reason" example:"Routine Checkup"`
+
+	// Notes for the appointment
+	// @example "Patient reports feeling unwell."
+	Notes string `json:"notes" example:"Patient reports feeling unwell."`
+
+	// Foreign key to the patient this appointment belongs to
+	PatientID uint `json:"patient_id"`
 }

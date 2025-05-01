@@ -1,9 +1,132 @@
 definitions:
+  models.Appointment:
+    description: Appointment data, including date, time, and reason for the appointment.
+    properties:
+      date:
+        description: |-
+          Date of the appointment
+          @example 2025-05-01
+        example: "2025-05-01"
+        type: string
+      id:
+        description: |-
+          ID of the appointment
+          @example 1
+        type: integer
+      notes:
+        description: |-
+          Notes for the appointment
+          @example "Patient reports feeling unwell."
+        example: Patient reports feeling unwell.
+        type: string
+      patient_id:
+        description: Foreign key to the patient this appointment belongs to
+        type: integer
+      reason:
+        description: |-
+          Reason for the appointment
+          @example Routine Checkup
+        example: Routine Checkup
+        type: string
+      time:
+        description: |-
+          Time of the appointment
+          @example 10:00 AM
+        example: 10:00 AM
+        type: string
+    required:
+    - date
+    - time
+    type: object
   models.Patient:
+    description: Patient data, including name, email, and appointments.
+    properties:
+      appointments:
+        description: |-
+          Appointments associated with the patient
+          @description Patient's appointments (if any)
+          @swagger:property
+          @type array
+          @items Appointment
+          @model
+        items:
+          $ref: '#/definitions/models.Appointment'
+        type: array
+      created_at:
+        description: |-
+          CreatedAt timestamp (inherited from gorm.Model)
+          @example "2025-05-01T12:00:00Z"
+        type: string
+      deleted_at:
+        description: |-
+          DeletedAt timestamp (nullable, inherited from gorm.Model)
+          @example "2025-05-01T12:00:00Z"
+        type: string
+      email:
+        description: |-
+          Email of the patient
+          @example john.doe@example.com
+          @description Patient's email address
+          @required
+        example: john.doe@example.com
+        type: string
+      id:
+        description: |-
+          ID of the patient (inherited from gorm.Model)
+          @example 1
+        type: integer
+      name:
+        description: |-
+          Name of the patient
+          @example John Doe
+          @description Patient's full name
+          @required
+        example: John Doe
+        type: string
+      updated_at:
+        description: |-
+          UpdatedAt timestamp (inherited from gorm.Model)
+          @example "2025-05-01T12:00:00Z"
+        type: string
+    required:
+    - email
+    - name
     type: object
 info:
   contact: {}
 paths:
+  /appointments:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of appointments
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all appointments
+      tags:
+      - appointments
   /patients:
     get:
       consumes:
@@ -59,4 +182,116 @@ paths:
             additionalProperties: true
             type: object
       summary: Create a new patient
+  /patients/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a single patient by their ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Patient'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Patient Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get patient by ID
+      tags:
+      - patients
+  /patients/{id}/appointments:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all appointments for a specific patient by patient ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Appointment'
+            type: array
+        "404":
+          description: Patient Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all appointments for a specific patient
+      tags:
+      - appointments
+    post:
+      consumes:
+      - application/json
+      description: Create a new appointment and link it to an existing patient
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Appointment Data
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Appointment Created
+          schema:
+            $ref: '#/definitions/models.Appointment'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Patient Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new appointment for a patient
+      tags:
+      - appointments
 swagger: "2.0"

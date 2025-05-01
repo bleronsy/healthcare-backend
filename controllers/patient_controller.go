@@ -60,6 +60,17 @@ func GetPatients(c *gin.Context) {
 	c.JSON(http.StatusOK, patients)
 }
 
+// GetPatientByID godoc
+// @Summary      Get patient by ID
+// @Description  Retrieve a single patient by their ID
+// @Tags         patients
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Patient ID"
+// @Success      200 {object} models.Patient
+// @Failure      400 {object} map[string]string "Invalid ID"
+// @Failure      404 {object} map[string]string "Patient Not Found"
+// @Router       /patients/{id} [get]
 func GetPatientByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
